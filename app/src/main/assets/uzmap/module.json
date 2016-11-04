@@ -1,0 +1,8 @@
+{
+  modules: [
+    {
+      name: 'linkedME',
+      class: 'cc.lkme.lkmeacsdk.LinkedMEModule'
+    }
+  ]
+}

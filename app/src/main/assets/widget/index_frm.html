@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width"/>
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>WinA</title>
+    <link rel="stylesheet" type="text/css" href="css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="css/box.css"/>
+    <script type="text/javascript" src="script/public.js"></script>
+    <style>
+    	p{
+    		color:#999;
+    		padding:5px;
+    	}
+    </style>
+    <script type="text/javascript">
+	    
+		var linkedME = null;
+		apiready = function(){
+
+	    	linkedME = api.require('linkedME');
+
+            //处理通过URI Scheme跳转后从服务器端获取的参数
+            //根据获取的参数进行页面的跳转
+            //ret.lkme_controlParam.id及ret.lkme_controlParam.name 为自定义的key，根据自身需要自定义参数
+            //通常是由web 端集成web sdk生成深度链接，并将"打开APP"按钮的跳转地址设置为该深度链接，因此参数设置需要与web端进行统一商定
+	    	function lkmeDataHandle(ret){
+	    	//ret.status为true，代表获取到了参数
+	    	 if (ret.status) {
+                alert("lkme_channel=" + ret.lkme_channel +
+	        	      ",lkme_feature=" + ret.lkme_feature +
+	        	      ",lkme_tag=" + ret.lkme_tag +
+	        	      ",lkme_stage=" + ret.lkme_stage +
+	        	      ",lkme_controlParam=" + ret.lkme_controlParam.id + ", " + ret.lkme_controlParam.name +
+	        	      ",lkme_new_user=" + ret.lkme_new_user +
+	        	      ",lkme_link=" + ret.lkme_link);
+	    	    }else{
+	    			 //为空
+                  alert(ret.error_info);
+	    		}
+	    	}
+
+            //LinkedME key
+	    	var param = {"linkedme_key":"linkedme_live_7e289a2484f4368dbafbd1e5c7d06903"};
+
+	    	//因APICloud引擎问题：在APP第一次打开的时候不回调resume方法，因此初始化APP分为两种方式，建议采用第一种方式
+	    	//初始化LinkedME，注意两种方式调用的方法名不同
+	    	//方式一：
+	    	linkedME.lkmeInitCallback(param, function(ret, err){
+               lkmeDataHandle(ret);
+	        });
+
+	    	//方式二：
+	    	//linkedME.lkmeInit(param);
+	    	////必须调用一次获取数据，不然无法通过传递进来的参数去服务器请求数据
+            //linkedME.lkmeObtainData("", function(ret, err){
+	        //	lkmeDataHandle(ret);
+	        //  });
+
+
+	        //是否打印日志
+	        linkedME.lkmeDebug();
+
+	        api.addEventListener({
+		      name:'resume'
+		    }, function(ret, err){
+		    //onResume时调用该方法用于获取数据
+		      linkedME.lkmeObtainData("", function(ret, err){
+	        	lkmeDataHandle(ret);
+	          });
+		    });
+
+		    api.addEventListener({
+		      name:'pause'
+		    }, function(ret, err){
+		    //onPause时调用该方法用于取消获取数据
+		      linkedME.lkmeCloseSession();
+		    });
+
+	    }
+
+        //创建深度链接
+        function createUrl(){
+          //lkme_channel:渠道[字符串类型]，多渠道请以英文逗号分隔
+          //lkme_feature:功能[字符串类型]
+          //lkme_tag:标签[字符串类型]，多标签请以英文逗号分隔
+          //lkme_stage:阶段[字符串类型]
+          //lkme_controlParam:自定义跳转参数[JSON数据格式]
+          var controlParam = {"id":"209222314","name":"linkedme"};
+          var param = {"lkme_channel":"微信,微博","lkme_feature":"分享","lkme_tag":"标签一,标签二","lkme_stage":"4","lkme_controlParam":controlParam};
+          linkedME.lkmeCreateUrl(param, function(ret, err){
+          	if (ret.status) {
+          		alert("深度连接创建成功，链接为：" + ret.lkme_url);
+          	}else{
+                alert("深度链接创建失败，失败日志：" + ret.error_info);
+          	}
+	      });
+        }
+    </script>
+</head>
+<body>
+<div id="wrap">
+    <div id="main">
+        <br>
+        <div class='itemtitle'>1、创建深度链接</div>
+        <div class="clickbtn" tapmode="active" onclick="createUrl()">获取深度链接</div>
+        <br>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,11 @@
+<widget id="A0000000000001"  version="0.0.1">
+    <name>LinkedMEDemo</name>
+    <description>A sample of LinkedME module extension.</description>
+    <author email="lipeng@linkedme.com" href="http://www.linkedme.cc">
+        developer
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+    <preference name="bounces" value="true" />
+    <preference name="customRefreshHeader" value="cusHeader" />
+</widget>
